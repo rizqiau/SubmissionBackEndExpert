@@ -1,0 +1,43 @@
+{
+  "name": "forum-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "start:dev": "nodemon src/app.js",
+    "test": "jest --setupFiles dotenv/config -i",
+    "test:watch:change": "jest --watch --setupFiles dotenv/config -i",
+    "test:watch": "jest --watchAll --coverage --setupFiles dotenv/config -i",
+    "migrate": "node-pg-migrate",
+    "migrate:test": "node-pg-migrate -f config/database/test.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/hapi": "^20.3.0",
+    "@hapi/jwt": "^2.2.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^10.0.0",
+    "instances-container": "^2.0.6",
+    "nanoid": "^3.3.11",
+    "pg": "^8.7.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.31.0",
+    "jest": "^27.5.1",
+    "node-pg-migrate": "^5.10.0",
+    "nodemon": "^3.1.10"
+  },
+  "jest": {                      
+    "testMatch": [
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/?(*.)+(spec|test).[tj]s?(x)",
+      "**/**/_test/**/*.[jt]s?(x)"
+    ]
+  }                               
+}
