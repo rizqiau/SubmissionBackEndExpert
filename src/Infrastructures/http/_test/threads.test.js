@@ -2,7 +2,7 @@ const pool = require("../../database/postgres/pool");
 const UsersTableTestHelper = require("../../../../tests/UsersTableTestHelper");
 const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper"); // Import ThreadsTableTestHelper
 const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper"); // <<< PASTIKAN BARIS INI ADA
-console.log("CommentsTableTestHelper after import:", CommentsTableTestHelper); // <<< TAMBAH BARIS INI
+// console.log("CommentsTableTestHelper after import:", CommentsTableTestHelper); // <<< TAMBAH BARIS INI
 const container = require("../../container");
 const createServer = require("../createServer");
 const Jwt = require("@hapi/jwt"); // Import Jwt
@@ -21,7 +21,7 @@ describe("/threads endpoint", () => {
     await UsersTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
-    console.log("Database tables cleaned in beforeAll.");
+    // console.log("Database tables cleaned in beforeAll.");
 
     // Register a dummy user
     userId = "user-test-threads";
@@ -32,13 +32,13 @@ describe("/threads endpoint", () => {
       password: hashedPassword, // <<< GUNAKAN HASHED PASSWORD
       fullname: "Thread User", // Tambahkan fullname karena required
     });
-    console.log('User "threaduser" added in beforeAll. ID:', userId); // DEBUG LOG
+    // console.log('User "threaduser" added in beforeAll. ID:', userId); // DEBUG LOG
 
-    const userExistsAfterAdd = await UsersTableTestHelper.findUsersById(userId); // <<< CEK KEMBALI
-    console.log(
-      'User "threaduser" exists after adding (beforeAll):',
-      userExistsAfterAdd.length > 0
-    ); // DEBUG LOG
+    // const userExistsAfterAdd = await UsersTableTestHelper.findUsersById(userId); // <<< CEK KEMBALI
+    // console.log(
+    //   'User "threaduser" exists after adding (beforeAll):',
+    //   userExistsAfterAdd.length > 0
+    // ); // DEBUG LOG
 
     // Login the user to get an access token
     const loginResponse = await server.inject({
@@ -49,8 +49,8 @@ describe("/threads endpoint", () => {
         password: "secret", // Default password from UsersTableTestHelper
       },
     });
-    console.log("Login Response Status Code:", loginResponse.statusCode);
-    console.log("Login Response Payload:", loginResponse.payload);
+    // console.log("Login Response Status Code:", loginResponse.statusCode);
+    // console.log("Login Response Payload:", loginResponse.payload);
 
     const responseJson = JSON.parse(loginResponse.payload);
     accessToken = responseJson.data.accessToken;
@@ -176,27 +176,27 @@ describe("/threads endpoint", () => {
       const dateComment1 = new Date("2021-08-08T07:05:00.000Z").toISOString();
       const dateComment2 = new Date("2021-08-08T07:10:00.000Z").toISOString();
 
-      const threadOwnerExistsCheck = await UsersTableTestHelper.findUsersById(
-        threadOwnerId
-      );
-      console.log(
-        'User "threaduser" exists before addThread (GET test):',
-        threadOwnerExistsCheck.length > 0
-      );
+      // const threadOwnerExistsCheck = await UsersTableTestHelper.findUsersById(
+      //   threadOwnerId
+      // );
+      // console.log(
+      //   'User "threaduser" exists before addThread (GET test):',
+      //   threadOwnerExistsCheck.length > 0
+      // );
 
       await UsersTableTestHelper.addUser({
         id: userIdComment,
         username: "commenter",
         fullname: "Commenter User",
       }); // Add a commenter user
-      console.log('User "commenter" added for GET test.'); // DEBUG LOG
+      // console.log('User "commenter" added for GET test.'); // DEBUG LOG
 
-      const threadOwnerExistsCheckAfterCommenter =
-        await UsersTableTestHelper.findUsersById(threadOwnerId);
-      console.log(
-        'User "threaduser" exists after adding commenter (GET test):',
-        threadOwnerExistsCheckAfterCommenter.length > 0
-      );
+      // const threadOwnerExistsCheckAfterCommenter =
+      //   await UsersTableTestHelper.findUsersById(threadOwnerId);
+      // console.log(
+      //   'User "threaduser" exists after adding commenter (GET test):',
+      //   threadOwnerExistsCheckAfterCommenter.length > 0
+      // );
 
       await ThreadsTableTestHelper.addThread({
         id: threadId,
@@ -206,10 +206,10 @@ describe("/threads endpoint", () => {
         date: dateThread,
       });
 
-      console.log(
-        "CommentsTableTestHelper before addComment:",
-        CommentsTableTestHelper
-      ); // <<< TAMBAH BARIS INI
+      // console.log(
+      //   "CommentsTableTestHelper before addComment:",
+      //   CommentsTableTestHelper
+      // ); // <<< TAMBAH BARIS INI
 
       await CommentsTableTestHelper.addComment({
         id: "comment-detail-1",
@@ -235,14 +235,14 @@ describe("/threads endpoint", () => {
 
       // Assert
       const responseJson = JSON.parse(response.payload);
-      console.log(
-        "GET /threads/{threadId} Response Status:",
-        response.statusCode
-      );
-      console.log(
-        "GET /threads/{threadId} Response Payload:",
-        response.payload
-      );
+      // console.log(
+      //   "GET /threads/{threadId} Response Status:",
+      //   response.statusCode
+      // );
+      // console.log(
+      //   "GET /threads/{threadId} Response Payload:",
+      //   response.payload
+      // );
       if (response.statusCode === 400) {
         console.error("Specific 400 error message:", responseJson.message); // <<< BARIS PENTING INI
       }

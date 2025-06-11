@@ -1,7 +1,7 @@
 const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper");
 const UsersTableTestHelper = require("../../../../tests/UsersTableTestHelper");
-const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper"); // Import CommentsTableTestHelper
-const InvariantError = require("../../../Commons/exceptions/InvariantError");
+const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper");
+const AuthorizationError = require("../../../Commons/exceptions/AuthorizationError");
 const NotFoundError = require("../../../Commons/exceptions/NotFoundError");
 const NewComment = require("../../../Domains/comments/entities/NewComment");
 const AddedComment = require("../../../Domains/comments/entities/AddedComment");
@@ -9,12 +9,18 @@ const pool = require("../../database/postgres/pool");
 const CommentRepositoryPostgres = require("../CommentRepositoryPostgres");
 
 describe("CommentRepositoryPostgres", () => {
-  const userId = "user-test-comments";
-  const threadId = "thread-test-comments";
-  const anotherThreadId = "thread-another"; // <<< TAMBAH BARIS INI
+  // Deklarasi global agar id bisa diakses di beforeEach dan afterEach
+  let userId;
+  let threadId;
+  let anotherThreadId;
 
-  beforeAll(async () => {
-    // Add dummy user and thread for testing comments
+  // Ganti dengan beforeEach dan afterEach untuk setiap test case
+  beforeEach(async () => {
+    // Tambahkan user dan thread untuk SETIAP test case secara terisolasi
+    userId = "user-test-comments"; // Atau gunakan nanoid jika ID harus unik setiap kali
+    threadId = "thread-test-comments";
+    anotherThreadId = "thread-another";
+
     await UsersTableTestHelper.addUser({ id: userId, username: "commentuser" });
     await ThreadsTableTestHelper.addThread({ id: threadId, owner: userId });
     await ThreadsTableTestHelper.addThread({
@@ -26,25 +32,25 @@ describe("CommentRepositoryPostgres", () => {
   });
 
   afterEach(async () => {
+    // Bersihkan semua tabel setelah SETIAP test case
     await CommentsTableTestHelper.cleanTable();
+    await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
   });
 
+  // afterAll hanya untuk menutup pool
   afterAll(async () => {
-    await UsersTableTestHelper.cleanTable();
-    await ThreadsTableTestHelper.cleanTable();
     await pool.end();
   });
 
   describe("addComment function", () => {
     it("should persist new comment and return added comment correctly", async () => {
-      // Arrange
-      const newCommentPayload = new NewComment({
-        content: "sebuah komentar",
-      });
-      newCommentPayload.threadId = threadId;
-      newCommentPayload.owner = userId;
+      // Arrange (tidak perlu add thread di sini lagi, karena sudah di beforeEach)
+      const newCommentPayload = new NewComment({ content: "sebuah komentar" });
+      newCommentPayload.threadId = threadId; // Gunakan threadId dari beforeEach
+      newCommentPayload.owner = userId; // Gunakan userId dari beforeEach
 
-      const fakeIdGenerator = () => "123"; // Stub ID generator
+      const fakeIdGenerator = () => "123";
       const commentRepositoryPostgres = new CommentRepositoryPostgres(
         pool,
         fakeIdGenerator
@@ -61,14 +67,12 @@ describe("CommentRepositoryPostgres", () => {
     });
 
     it("should return AddedComment correctly", async () => {
-      // Arrange
-      const newCommentPayload = new NewComment({
-        content: "sebuah komentar",
-      });
-      newCommentPayload.threadId = threadId;
-      newCommentPayload.owner = userId;
+      // Arrange (tidak perlu add thread di sini lagi)
+      const newCommentPayload = new NewComment({ content: "sebuah komentar" });
+      newCommentPayload.threadId = threadId; // Gunakan threadId dari beforeEach
+      newCommentPayload.owner = userId; // Gunakan userId dari beforeEach
 
-      const fakeIdGenerator = () => "123"; // Stub ID generator
+      const fakeIdGenerator = () => "123";
       const commentRepositoryPostgres = new CommentRepositoryPostgres(
         pool,
         fakeIdGenerator
@@ -92,17 +96,14 @@ describe("CommentRepositoryPostgres", () => {
 
   describe("deleteComment function", () => {
     it("should throw NotFoundError when comment not found", async () => {
-      // Arrange
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
-
-      // Action & Assert
       await expect(
         commentRepositoryPostgres.deleteComment("comment-invalid")
       ).rejects.toThrowError(NotFoundError);
     });
 
     it("should soft delete comment from database", async () => {
-      // Arrange
+      // Arrange (tidak perlu add thread di sini lagi)
       const commentId = "comment-456";
       await CommentsTableTestHelper.addComment({
         id: commentId,
@@ -117,72 +118,100 @@ describe("CommentRepositoryPostgres", () => {
 
       // Assert
       const comments = await CommentsTableTestHelper.findCommentById(commentId);
-      expect(comments).toHaveLength(1); // Still exists but soft deleted
+      expect(comments).toHaveLength(1);
       expect(comments[0].is_delete).toEqual(true);
     });
   });
 
   describe("verifyCommentOwner function", () => {
-    it("should throw InvariantError when comment owner is not valid", async () => {
-      // Arrange
+    it("should throw AuthorizationError when comment owner is not valid", async () => {
+      // Arrange (tidak perlu add thread di sini lagi)
       const commentId = "comment-789";
-      const wrongUserId = "user-wrong";
+      const wrongUserId = "user-wrong"; // Ini perlu user dummy baru atau unik
+      await UsersTableTestHelper.addUser({
+        id: wrongUserId,
+        username: "wronguser",
+      }); // Tambah user wrong user
       await CommentsTableTestHelper.addComment({
         id: commentId,
         content: "some comment",
         threadId,
-        owner: userId, // Owned by userId
-      });
+        owner: userId,
+      }); // Gunakan userId dari beforeEach
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
-      // Action & Assert
       await expect(
         commentRepositoryPostgres.verifyCommentOwner(commentId, wrongUserId)
-      ).rejects.toThrowError(InvariantError);
+      ).rejects.toThrowError(AuthorizationError);
     });
 
-    it("should not throw InvariantError when comment owner is valid", async () => {
-      // Arrange
+    it("should not throw AuthorizationError when comment owner is valid", async () => {
+      // Arrange (tidak perlu add thread di sini lagi)
       const commentId = "comment-012";
       await CommentsTableTestHelper.addComment({
         id: commentId,
         content: "some comment",
         threadId,
         owner: userId,
-      });
+      }); // Gunakan userId dari beforeEach
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
-      // Action & Assert
       await expect(
         commentRepositoryPostgres.verifyCommentOwner(commentId, userId)
-      ).resolves.not.toThrow(InvariantError);
+      ) // Gunakan userId dari beforeEach
+        .resolves.not.toThrow(AuthorizationError);
     });
 
-    it("should throw InvariantError when trying to verify owner of a deleted comment", async () => {
-      // Arrange
+    it("should throw NotFoundError when trying to verify owner of a deleted comment", async () => {
+      // Arrange (tidak perlu add thread di sini lagi)
       const commentId = "comment-deleted";
       await CommentsTableTestHelper.addComment({
         id: commentId,
         content: "some comment",
         threadId,
         owner: userId,
-        isDeleted: true, // Mark as deleted
-      });
+        isDeleted: true,
+      }); // Gunakan userId dari beforeEach
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
-      // Action & Assert
       await expect(
         commentRepositoryPostgres.verifyCommentOwner(commentId, userId)
-      ).rejects.toThrowError(InvariantError);
+      ) // Gunakan userId dari beforeEach
+        .rejects.toThrowError(NotFoundError);
+    });
+  });
+
+  describe("verifyCommentExists function", () => {
+    it("should throw NotFoundError when comment does not exist", async () => {
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+      await expect(
+        commentRepositoryPostgres.verifyCommentExists("comment-not-exist")
+      ).rejects.toThrowError(NotFoundError);
+    });
+
+    it("should not throw NotFoundError when comment exists", async () => {
+      // Arrange (tidak perlu add thread di sini lagi)
+      const commentId = "comment-exists";
+      await CommentsTableTestHelper.addComment({
+        id: commentId,
+        content: "some content",
+        threadId,
+        owner: userId,
+      }); // Gunakan userId dari beforeEach
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      await expect(
+        commentRepositoryPostgres.verifyCommentExists(commentId)
+      ).resolves.not.toThrow(NotFoundError);
     });
   });
 
   describe("getCommentsByThreadId function", () => {
     it("should return comments by threadId correctly", async () => {
-      // Arrange
+      // Arrange (tidak perlu add thread di sini lagi)
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       const date1 = new Date().toISOString();
-      const date2 = new Date(new Date().getTime() + 1000).toISOString(); // 1 second later
+      const date2 = new Date(new Date().getTime() + 1000).toISOString();
 
       await CommentsTableTestHelper.addComment({
         id: "comment-111",
@@ -190,7 +219,7 @@ describe("CommentRepositoryPostgres", () => {
         threadId: threadId,
         owner: userId,
         date: date1,
-      });
+      }); // Gunakan threadId/userId dari beforeEach
       await CommentsTableTestHelper.addComment({
         id: "comment-222",
         content: "comment 2",
@@ -201,9 +230,9 @@ describe("CommentRepositoryPostgres", () => {
       await CommentsTableTestHelper.addComment({
         id: "comment-333",
         content: "comment 3",
-        threadId: "thread-another",
-        owner: userId, // different thread
-      });
+        threadId: anotherThreadId,
+        owner: userId,
+      }); // Gunakan threadId/userId dari beforeEach
 
       // Action
       const comments = await commentRepositoryPostgres.getCommentsByThreadId(
@@ -226,7 +255,7 @@ describe("CommentRepositoryPostgres", () => {
     });
 
     it('should return deleted comments with "komentar telah dihapus" content', async () => {
-      // Arrange
+      // Arrange (tidak perlu add thread di sini lagi)
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       const date = new Date().toISOString();
       await CommentsTableTestHelper.addComment({
@@ -238,18 +267,16 @@ describe("CommentRepositoryPostgres", () => {
         isDeleted: true,
       });
 
-      // Action
       const comments = await commentRepositoryPostgres.getCommentsByThreadId(
         threadId
       );
 
-      // Assert
       expect(comments).toHaveLength(1);
       expect(comments[0].id).toEqual("comment-deleted-test");
-      expect(comments[0].content).toEqual("original content"); // <<< GANTI DENGAN INI
+      expect(comments[0].content).toEqual("original content");
       expect(comments[0].username).toEqual("commentuser");
       expect(new Date(comments[0].date).toISOString()).toEqual(date);
-      expect(comments[0].is_delete).toEqual(true); // Check the raw value first
+      expect(comments[0].is_delete).toEqual(true);
     });
   });
 });
