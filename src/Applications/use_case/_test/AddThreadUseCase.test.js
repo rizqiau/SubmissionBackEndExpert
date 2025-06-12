@@ -6,6 +6,7 @@ const AddUserUseCase = require("../AddUserUseCase");
 const NewThread = require("../../../Domains/threads/entities/NewThread");
 const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
 const AddThreadUseCase = require("../AddThreadUseCase");
+const AddedThread = require("../../../Domains/threads/entities/AddedThread"); // <<< TAMBAH IMPORT INI
 
 describe("AddThreadUseCase", () => {
   it("should orchestrating the add thread action correctly", async () => {
@@ -15,11 +16,11 @@ describe("AddThreadUseCase", () => {
     };
     const credentialId = "user-123"; // Tambahkan ini agar test owner-nya ada
 
-    const mockAddedThread = {
+    const mockAddedThread = new AddedThread({
       id: "thread-123",
       title: useCasePayload.title,
       owner: credentialId,
-    };
+    });
 
     const mockThreadRepository = new ThreadRepository();
     mockThreadRepository.addThread = jest
