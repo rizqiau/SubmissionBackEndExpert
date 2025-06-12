@@ -3,7 +3,7 @@ const NewComment = require("../NewComment");
 describe("a NewComment entities", () => {
   it("should throw error when payload did not contain needed property", () => {
     // Arrange
-    const payload = {}; // content is missing
+    const payload = {};
 
     // Action & Assert
     expect(() => new NewComment(payload)).toThrowError(
@@ -14,7 +14,7 @@ describe("a NewComment entities", () => {
   it("should throw error when payload did not meet data type specification", () => {
     // Arrange
     const payload = {
-      content: 123, // wrong data type
+      content: 123,
     };
 
     // Action & Assert

@@ -9,7 +9,7 @@ describe("a ThreadDetail entities", () => {
       date: "2021-08-08T07:19:09.775Z",
       username: "dicoding",
       comments: [],
-    }; // id is missing
+    };
 
     // Action & Assert
     expect(() => new ThreadDetail(payload)).toThrowError(
@@ -20,12 +20,12 @@ describe("a ThreadDetail entities", () => {
   it("should throw error when payload did not meet data type specification", () => {
     // Arrange
     const payload = {
-      id: 123, // wrong data type
+      id: 123,
       title: "a thread title",
       body: "a thread body",
       date: "2021-08-08T07:19:09.775Z",
       username: "dicoding",
-      comments: "not an array", // wrong data type
+      comments: "not an array",
     };
 
     // Action & Assert

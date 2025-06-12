@@ -1,22 +1,17 @@
-/* istanbul ignore file */
-
 const { createContainer } = require("instances-container");
-
-// external agency
 const { nanoid } = require("nanoid");
 const bcrypt = require("bcrypt");
 const Jwt = require("@hapi/jwt");
 const pool = require("./database/postgres/pool");
 
-// service (repository, helper, manager, etc)
 const UserRepository = require("../Domains/users/UserRepository");
 const PasswordHash = require("../Applications/security/PasswordHash");
 const UserRepositoryPostgres = require("./repository/UserRepositoryPostgres");
 const BcryptPasswordHash = require("./security/BcryptPasswordHash");
-const ThreadRepository = require("../Domains/threads/ThreadRepository"); // Import ThreadRepository interface
-const ThreadRepositoryPostgres = require("./repository/ThreadRepositoryPostgres"); // Import ThreadRepositoryPostgres implementation
-const CommentRepository = require("../Domains/comments/CommentRepository"); // Import CommentRepository interface
-const CommentRepositoryPostgres = require("./repository/CommentRepositoryPostgres"); // Import CommentRepositoryPostgres implementation
+const ThreadRepository = require("../Domains/threads/ThreadRepository");
+const ThreadRepositoryPostgres = require("./repository/ThreadRepositoryPostgres");
+const CommentRepository = require("../Domains/comments/CommentRepository");
+const CommentRepositoryPostgres = require("./repository/CommentRepositoryPostgres");
 
 // use case
 const AddUserUseCase = require("../Applications/use_case/AddUserUseCase");
@@ -27,15 +22,13 @@ const AuthenticationRepository = require("../Domains/authentications/Authenticat
 const AuthenticationRepositoryPostgres = require("./repository/AuthenticationRepositoryPostgres");
 const LogoutUserUseCase = require("../Applications/use_case/LogoutUserUseCase");
 const RefreshAuthenticationUseCase = require("../Applications/use_case/RefreshAuthenticationUseCase");
-const AddThreadUseCase = require("../Applications/use_case/AddThreadUseCase"); // Import AddThreadUseCase
-const AddCommentUseCase = require("../Applications/use_case/AddCommentUseCase"); // Import AddCommentUseCase
-const DeleteCommentUseCase = require("../Applications/use_case/DeleteCommentUseCase"); // Import DeleteCommentUseCase
-const GetThreadDetailUseCase = require("../Applications/use_case/GetThreadDetailUseCase"); // <<< TAMBAH BARIS INI
+const AddThreadUseCase = require("../Applications/use_case/AddThreadUseCase");
+const AddCommentUseCase = require("../Applications/use_case/AddCommentUseCase");
+const DeleteCommentUseCase = require("../Applications/use_case/DeleteCommentUseCase");
+const GetThreadDetailUseCase = require("../Applications/use_case/GetThreadDetailUseCase");
 
-// creating container
 const container = createContainer();
 
-// registering services and repository
 container.register([
   {
     key: UserRepository.name,
@@ -107,7 +100,7 @@ container.register([
           concrete: pool,
         },
         {
-          concrete: nanoid, // nanoid untuk id comment
+          concrete: nanoid,
         },
       ],
     },

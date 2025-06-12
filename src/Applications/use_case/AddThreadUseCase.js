@@ -6,9 +6,8 @@ class AddThreadUseCase {
   }
 
   async execute(useCasePayload, credentialId) {
-    // Tambahkan credentialId sebagai argumen
     const newThread = new NewThread(useCasePayload);
-    // Tambahkan owner ke objek newThread sebelum dikirim ke repository
+
     newThread.owner = credentialId;
     return this._threadRepository.addThread(newThread);
   }

@@ -1,10 +1,10 @@
 const pool = require("../../database/postgres/pool");
 const UsersTableTestHelper = require("../../../../tests/UsersTableTestHelper");
 const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper");
-const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper"); // Import CommentsTableTestHelper
+const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper");
 const container = require("../../container");
 const createServer = require("../createServer");
-const bcrypt = require("bcrypt"); // Import bcrypt for hashing password in test setup
+const bcrypt = require("bcrypt");
 
 describe("/threads/{threadId}/comments endpoint", () => {
   let server;
@@ -15,7 +15,6 @@ describe("/threads/{threadId}/comments endpoint", () => {
   beforeAll(async () => {
     server = await createServer(container);
 
-    // Register a dummy user and login to get access token
     userId = "user-test-comments-e2e";
     const hashedPassword = await bcrypt.hash("secret", 10);
     await UsersTableTestHelper.addUser({
@@ -36,7 +35,6 @@ describe("/threads/{threadId}/comments endpoint", () => {
     const responseJson = JSON.parse(loginResponse.payload);
     accessToken = responseJson.data.accessToken;
 
-    // Add a dummy thread for comments
     threadId = "thread-test-comments-e2e";
     await ThreadsTableTestHelper.addThread({ id: threadId, owner: userId });
   });
@@ -204,7 +202,7 @@ describe("/threads/{threadId}/comments endpoint", () => {
 
       const comments = await CommentsTableTestHelper.findCommentById(commentId);
       expect(comments).toHaveLength(1);
-      expect(comments[0].is_delete).toEqual(true); // Pastikan sudah di-soft delete
+      expect(comments[0].is_delete).toEqual(true);
     });
 
     it("should response 401 when request is not authenticated", async () => {
@@ -245,10 +243,9 @@ describe("/threads/{threadId}/comments endpoint", () => {
         id: commentId,
         content: "comment with wrong owner",
         threadId,
-        owner: userId, // Owned by original user
+        owner: userId,
       });
 
-      // Login as wrong owner to get their token
       const loginWrongResponse = await server.inject({
         method: "POST",
         url: "/authentications",
@@ -281,7 +278,7 @@ describe("/threads/{threadId}/comments endpoint", () => {
     it("should response 404 when thread is not found", async () => {
       // Arrange
       const invalidThreadId = "thread-delete-invalid";
-      const commentId = "comment-delete-invalid"; // This comment might not even exist on this invalid thread
+      const commentId = "comment-delete-invalid";
 
       // Action
       const response = await server.inject({

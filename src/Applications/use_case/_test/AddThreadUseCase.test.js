@@ -6,7 +6,7 @@ const AddUserUseCase = require("../AddUserUseCase");
 const NewThread = require("../../../Domains/threads/entities/NewThread");
 const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
 const AddThreadUseCase = require("../AddThreadUseCase");
-const AddedThread = require("../../../Domains/threads/entities/AddedThread"); // <<< TAMBAH IMPORT INI
+const AddedThread = require("../../../Domains/threads/entities/AddedThread");
 
 describe("AddThreadUseCase", () => {
   it("should orchestrating the add thread action correctly", async () => {
@@ -14,7 +14,7 @@ describe("AddThreadUseCase", () => {
       title: "a thread title",
       body: "a thread body",
     };
-    const credentialId = "user-123"; // Tambahkan ini agar test owner-nya ada
+    const credentialId = "user-123";
 
     const mockAddedThread = new AddedThread({
       id: "thread-123",
@@ -38,11 +38,10 @@ describe("AddThreadUseCase", () => {
 
     expect(addedThread).toStrictEqual(mockAddedThread);
 
-    // UBAH INI: Pastikan objek yang diharapkan cocok dengan apa yang benar-benar dikirim
     expect(mockThreadRepository.addThread).toBeCalledWith({
       title: useCasePayload.title,
       body: useCasePayload.body,
-      owner: credentialId, // Pastikan owner ada di sini
+      owner: credentialId,
     });
   });
 });

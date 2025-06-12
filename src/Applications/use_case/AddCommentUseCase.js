@@ -7,13 +7,10 @@ class AddCommentUseCase {
   }
 
   async execute(useCasePayload, credentialId, threadId) {
-    // Validasi payload
     const newComment = new NewComment(useCasePayload);
 
-    // Verifikasi thread
     await this._threadRepository.verifyThreadExists(threadId);
 
-    // Tambahkan threadId dan owner ke newComment
     newComment.threadId = threadId;
     newComment.owner = credentialId;
 

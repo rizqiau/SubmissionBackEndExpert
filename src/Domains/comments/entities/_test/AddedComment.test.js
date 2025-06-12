@@ -6,7 +6,7 @@ describe("a AddedComment entities", () => {
     const payload = {
       content: "a comment content",
       owner: "user-123",
-    }; // id is missing
+    };
 
     // Action & Assert
     expect(() => new AddedComment(payload)).toThrowError(
@@ -17,9 +17,9 @@ describe("a AddedComment entities", () => {
   it("should throw error when payload did not meet data type specification", () => {
     // Arrange
     const payload = {
-      id: 123, // wrong data type
-      content: true, // wrong data type
-      owner: {}, // wrong data type
+      id: 123,
+      content: true,
+      owner: {},
     };
 
     // Action & Assert

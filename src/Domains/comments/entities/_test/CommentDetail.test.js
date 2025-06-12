@@ -8,7 +8,7 @@ describe("a CommentDetail entities", () => {
       date: "2021-08-08T07:22:33.555Z",
       content: "sebuah comment",
       is_delete: false,
-    }; // id is missing
+    };
 
     // Action & Assert
     expect(() => new CommentDetail(payload)).toThrowError(
@@ -19,11 +19,11 @@ describe("a CommentDetail entities", () => {
   it("should throw error when payload did not meet data type specification", () => {
     // Arrange
     const payload = {
-      id: 123, // wrong data type
+      id: 123,
       username: "dicoding",
       date: "2021-08-08T07:22:33.555Z",
-      content: true, // wrong data type
-      is_delete: "false", // wrong data type
+      content: true,
+      is_delete: "false",
     };
 
     // Action & Assert

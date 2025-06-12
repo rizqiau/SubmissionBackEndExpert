@@ -16,7 +16,7 @@ describe("DeleteCommentUseCase", () => {
     mockThreadRepository.verifyThreadExists = jest
       .fn()
       .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.verifyCommentExists = jest // PASTIKAN ADA BARIS INI
+    mockCommentRepository.verifyCommentExists = jest
       .fn()
       .mockImplementation(() => Promise.resolve());
     mockCommentRepository.verifyCommentOwner = jest
@@ -38,7 +38,7 @@ describe("DeleteCommentUseCase", () => {
     );
     expect(mockCommentRepository.verifyCommentExists).toBeCalledWith(
       useCasePayload.commentId
-    ); // PASTIKAN ADA BARIS INI
+    );
     expect(mockCommentRepository.verifyCommentOwner).toBeCalledWith(
       useCasePayload.commentId,
       useCasePayload.owner

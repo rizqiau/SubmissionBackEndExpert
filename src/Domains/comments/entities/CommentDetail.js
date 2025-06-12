@@ -27,13 +27,11 @@ class CommentDetail {
       typeof username !== "string" ||
       typeof content !== "string" ||
       typeof is_delete !== "boolean" ||
-      // <<< UBAH ATAU TAMBAH PEMERIKSAAN TIPE DATA UNTUK 'date'
-      // Memungkinkan 'date' berupa string ATAU objek Date
       !(typeof date === "string" || date instanceof Date)
     ) {
       throw new Error("COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION");
     }
-    // Tambahkan validasi jika `date` adalah Date object yang tidak valid (misal `new Date('invalid')`)
+
     if (date instanceof Date && isNaN(date.getTime())) {
       throw new Error("COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION");
     }

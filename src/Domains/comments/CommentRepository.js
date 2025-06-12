@@ -16,7 +16,6 @@ class CommentRepository {
   }
 
   async verifyCommentExists(commentId) {
-    // PASTIKAN ADA BARIS INI
     throw new Error("COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED");
   }
 }

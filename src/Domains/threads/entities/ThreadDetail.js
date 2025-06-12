@@ -9,7 +9,7 @@ class ThreadDetail {
     this.body = body;
     this.date = new Date(date).toISOString();
     this.username = username;
-    this.comments = comments; // comments akan berisi array objek CommentDetail
+    this.comments = comments;
   }
 
   _verifyPayload({ id, title, body, date, username, comments }) {
@@ -23,13 +23,10 @@ class ThreadDetail {
       typeof body !== "string" ||
       typeof username !== "string" ||
       !Array.isArray(comments) ||
-      // <<< UBAH ATAU TAMBAH PEMERIKSAAN TIPE DATA UNTUK 'date'
-      // Memungkinkan 'date' berupa string ATAU objek Date
       !(typeof date === "string" || date instanceof Date)
     ) {
       throw new Error("THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION");
     }
-    // Tambahkan validasi jika `date` adalah Date object yang tidak valid
     if (date instanceof Date && isNaN(date.getTime())) {
       throw new Error("THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION");
     }

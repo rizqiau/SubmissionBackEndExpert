@@ -1,7 +1,7 @@
 const NewComment = require("../../../Domains/comments/entities/NewComment");
 const AddedComment = require("../../../Domains/comments/entities/AddedComment");
-const ThreadRepository = require("../../../Domains/threads/ThreadRepository"); // Import ThreadRepository
-const CommentRepository = require("../../../Domains/comments/CommentRepository"); // Import CommentRepository
+const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
+const CommentRepository = require("../../../Domains/comments/CommentRepository");
 const AddCommentUseCase = require("../AddCommentUseCase");
 
 describe("AddCommentUseCase", () => {
@@ -19,19 +19,16 @@ describe("AddCommentUseCase", () => {
       owner: credentialId,
     });
 
-    /** creating dependency of use case */
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
 
-    /** mocking needed function */
     mockThreadRepository.verifyThreadExists = jest
       .fn()
-      .mockImplementation(() => Promise.resolve()); // Mock success for thread existence
+      .mockImplementation(() => Promise.resolve());
     mockCommentRepository.addComment = jest
       .fn()
       .mockImplementation(() => Promise.resolve(mockAddedComment));
 
-    /** creating use case instance */
     const addCommentUseCase = new AddCommentUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
@@ -53,12 +50,9 @@ describe("AddCommentUseCase", () => {
       })
     );
 
-    // Ensure verifyThreadExists is called with correct threadId
     expect(mockThreadRepository.verifyThreadExists).toBeCalledWith(threadId);
 
-    // Ensure addComment is called with correct NewComment object
     expect(mockCommentRepository.addComment).toBeCalledWith({
-      // <<< UBAH INI
       content: "sebuah komentar",
       threadId: threadId,
       owner: credentialId,

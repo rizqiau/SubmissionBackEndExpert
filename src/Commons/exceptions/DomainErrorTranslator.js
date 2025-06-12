@@ -1,6 +1,6 @@
 const InvariantError = require("./InvariantError");
-const NotFoundError = require("./NotFoundError"); // <<< TAMBAH BARIS INI
-const AuthorizationError = require("./AuthorizationError"); // <<< TAMBAH BARIS INI
+const NotFoundError = require("./NotFoundError");
+const AuthorizationError = require("./AuthorizationError");
 
 const DomainErrorTranslator = {
   translate(error) {

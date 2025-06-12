@@ -1,14 +1,13 @@
 const pool = require("../../database/postgres/pool");
 const UsersTableTestHelper = require("../../../../tests/UsersTableTestHelper");
-const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper"); // Import ThreadsTableTestHelper
-const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper"); // <<< PASTIKAN BARIS INI ADA
-// console.log("CommentsTableTestHelper after import:", CommentsTableTestHelper); // <<< TAMBAH BARIS INI
+const ThreadsTableTestHelper = require("../../../../tests/ThreadsTableTestHelper");
+const CommentsTableTestHelper = require("../../../../tests/CommentsTableTestHelper");
 const container = require("../../container");
 const createServer = require("../createServer");
-const Jwt = require("@hapi/jwt"); // Import Jwt
-const AuthenticationTokenManager = require("../../../Applications/security/AuthenticationTokenManager"); // Import AuthenticationTokenManager
-const JwtTokenManager = require("../../security/JwtTokenManager"); // Import JwtTokenManager
-const bcrypt = require("bcrypt"); // <<< TAMBAH BARIS INI UNTUK BCrypt
+const Jwt = require("@hapi/jwt");
+const AuthenticationTokenManager = require("../../../Applications/security/AuthenticationTokenManager");
+const JwtTokenManager = require("../../security/JwtTokenManager");
+const bcrypt = require("bcrypt");
 
 describe("/threads endpoint", () => {
   let server;
@@ -21,36 +20,23 @@ describe("/threads endpoint", () => {
     await UsersTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
-    // console.log("Database tables cleaned in beforeAll.");
 
-    // Register a dummy user
     userId = "user-test-threads";
-    const hashedPassword = await bcrypt.hash("secret", 10); // <<< TAMBAH DAN UBAH BARIS INI
+    const hashedPassword = await bcrypt.hash("secret", 10);
     await UsersTableTestHelper.addUser({
       id: userId,
       username: "threaduser",
-      password: hashedPassword, // <<< GUNAKAN HASHED PASSWORD
-      fullname: "Thread User", // Tambahkan fullname karena required
+      password: hashedPassword,
+      fullname: "Thread User",
     });
-    // console.log('User "threaduser" added in beforeAll. ID:', userId); // DEBUG LOG
-
-    // const userExistsAfterAdd = await UsersTableTestHelper.findUsersById(userId); // <<< CEK KEMBALI
-    // console.log(
-    //   'User "threaduser" exists after adding (beforeAll):',
-    //   userExistsAfterAdd.length > 0
-    // ); // DEBUG LOG
-
-    // Login the user to get an access token
     const loginResponse = await server.inject({
       method: "POST",
       url: "/authentications",
       payload: {
         username: "threaduser",
-        password: "secret", // Default password from UsersTableTestHelper
+        password: "secret",
       },
     });
-    // console.log("Login Response Status Code:", loginResponse.statusCode);
-    // console.log("Login Response Payload:", loginResponse.payload);
 
     const responseJson = JSON.parse(loginResponse.payload);
     accessToken = responseJson.data.accessToken;
@@ -97,7 +83,7 @@ describe("/threads endpoint", () => {
       // Arrange
       const requestPayload = {
         title: "a thread title",
-      }; // body is missing
+      };
 
       // Action
       const response = await server.inject({
@@ -121,7 +107,7 @@ describe("/threads endpoint", () => {
     it("should response 400 when request payload not meet data type specification", async () => {
       // Arrange
       const requestPayload = {
-        title: 123, // wrong data type
+        title: 123,
         body: "a thread body",
       };
 
@@ -156,13 +142,12 @@ describe("/threads endpoint", () => {
         method: "POST",
         url: "/threads",
         payload: requestPayload,
-        // No Authorization header
       });
 
       // Assert
       expect(response.statusCode).toEqual(401);
       const responseJson = JSON.parse(response.payload);
-      expect(responseJson.message).toEqual("Missing authentication"); // Hapi's default message for missing auth
+      expect(responseJson.message).toEqual("Missing authentication");
     });
   });
 
@@ -171,32 +156,15 @@ describe("/threads endpoint", () => {
       // Arrange
       const threadId = "thread-detail-test";
       const userIdComment = "user-commenter";
-      const threadOwnerId = userId; // thread owner is the same as accessToken user
+      const threadOwnerId = userId;
       const dateThread = new Date("2021-08-08T07:00:00.000Z").toISOString();
       const dateComment1 = new Date("2021-08-08T07:05:00.000Z").toISOString();
       const dateComment2 = new Date("2021-08-08T07:10:00.000Z").toISOString();
-
-      // const threadOwnerExistsCheck = await UsersTableTestHelper.findUsersById(
-      //   threadOwnerId
-      // );
-      // console.log(
-      //   'User "threaduser" exists before addThread (GET test):',
-      //   threadOwnerExistsCheck.length > 0
-      // );
-
       await UsersTableTestHelper.addUser({
         id: userIdComment,
         username: "commenter",
         fullname: "Commenter User",
-      }); // Add a commenter user
-      // console.log('User "commenter" added for GET test.'); // DEBUG LOG
-
-      // const threadOwnerExistsCheckAfterCommenter =
-      //   await UsersTableTestHelper.findUsersById(threadOwnerId);
-      // console.log(
-      //   'User "threaduser" exists after adding commenter (GET test):',
-      //   threadOwnerExistsCheckAfterCommenter.length > 0
-      // );
+      });
 
       await ThreadsTableTestHelper.addThread({
         id: threadId,
@@ -205,11 +173,6 @@ describe("/threads endpoint", () => {
         body: "Body Thread Test Detail",
         date: dateThread,
       });
-
-      // console.log(
-      //   "CommentsTableTestHelper before addComment:",
-      //   CommentsTableTestHelper
-      // ); // <<< TAMBAH BARIS INI
 
       await CommentsTableTestHelper.addComment({
         id: "comment-detail-1",
@@ -235,16 +198,9 @@ describe("/threads endpoint", () => {
 
       // Assert
       const responseJson = JSON.parse(response.payload);
-      // console.log(
-      //   "GET /threads/{threadId} Response Status:",
-      //   response.statusCode
-      // );
-      // console.log(
-      //   "GET /threads/{threadId} Response Payload:",
-      //   response.payload
-      // );
+
       if (response.statusCode === 400) {
-        console.error("Specific 400 error message:", responseJson.message); // <<< BARIS PENTING INI
+        console.error("Specific 400 error message:", responseJson.message);
       }
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual("success");
@@ -254,8 +210,8 @@ describe("/threads endpoint", () => {
       expect(responseJson.data.thread.body).toEqual("Body Thread Test Detail");
       expect(new Date(responseJson.data.thread.date).toISOString()).toEqual(
         dateThread
-      ); // Pastikan tanggal konsisten UTC
-      expect(responseJson.data.thread.username).toEqual("threaduser"); // Username dari owner thread
+      );
+      expect(responseJson.data.thread.username).toEqual("threaduser");
 
       // Assert comments
       expect(responseJson.data.thread.comments).toHaveLength(2);
@@ -283,7 +239,7 @@ describe("/threads endpoint", () => {
       ).toEqual(dateComment2);
       expect(responseJson.data.thread.comments[1].content).toEqual(
         "**komentar telah dihapus**"
-      ); // Perhatikan ini
+      );
     });
 
     it("should response 404 when thread is not found", async () => {

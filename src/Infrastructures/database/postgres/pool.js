@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 const { Pool } = require("pg");
 const { types } = require("pg");
 
@@ -9,7 +8,7 @@ types.setTypeParser(types.builtins.TIMESTAMPTZ, (val) => {
   return new Date(val);
 });
 types.setTypeParser(types.builtins.BOOL, (val) => {
-  return val === "t"; // PostgreSQL seringkali mengembalikan 't' untuk true, 'f' untuk false
+  return val === "t";
 });
 
 const testConfig = {
