@@ -42,7 +42,20 @@ describe("a ThreadDetail entities", () => {
       body: "a thread body",
       date: "2021-08-08T07:19:09.775Z",
       username: "dicoding",
-      comments: [],
+      comments: [
+        {
+          id: "comment-111",
+          username: "johndoe",
+          date: "2021-08-08T07:20:00.000Z",
+          content: "sebuah komentar",
+        },
+        {
+          id: "comment-222",
+          username: "dicoding",
+          date: "2021-08-08T07:21:00.000Z",
+          content: "**komentar telah dihapus**",
+        },
+      ],
     };
 
     // Action
@@ -57,5 +70,13 @@ describe("a ThreadDetail entities", () => {
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
     expect(comments).toEqual(payload.comments);
+    expect(Array.isArray(comments)).toBe(true);
+    expect(comments).toHaveLength(2);
+    expect(comments[0]).toBeInstanceOf(Object);
+    expect(comments[0].id).toBeDefined();
+    expect(typeof comments[0].id).toEqual("string");
+    expect(comments[1].username).toBeDefined();
+    expect(typeof comments[1].username).toEqual("string");
+    expect(comments[1].content).toEqual("**komentar telah dihapus**");
   });
 });
