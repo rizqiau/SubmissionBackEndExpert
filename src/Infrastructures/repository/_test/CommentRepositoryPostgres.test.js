@@ -116,6 +116,19 @@ describe("CommentRepositoryPostgres", () => {
   });
 
   describe("verifyCommentOwner function", () => {
+    it("should throw NotFoundError when comment does not exist", async () => {
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+      const nonExistentCommentId = "comment-non-existent";
+      const dummyOwnerId = "user-dummy"; // Owner tidak relevan di sini karena komentar tidak ada
+
+      await expect(
+        commentRepositoryPostgres.verifyCommentOwner(
+          nonExistentCommentId,
+          dummyOwnerId
+        )
+      ).rejects.toThrowError(NotFoundError);
+    });
+
     it("should throw AuthorizationError when comment owner is not valid", async () => {
       const commentId = "comment-789";
       const wrongUserId = "user-wrong";

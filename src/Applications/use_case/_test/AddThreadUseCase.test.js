@@ -1,8 +1,3 @@
-const RegisterUser = require("../../../Domains/users/entities/RegisterUser");
-const RegisteredUser = require("../../../Domains/users/entities/RegisteredUser");
-const UserRepository = require("../../../Domains/users/UserRepository");
-const PasswordHash = require("../../security/PasswordHash");
-const AddUserUseCase = require("../AddUserUseCase");
 const NewThread = require("../../../Domains/threads/entities/NewThread");
 const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
 const AddThreadUseCase = require("../AddThreadUseCase");
@@ -16,7 +11,13 @@ describe("AddThreadUseCase", () => {
     };
     const credentialId = "user-123";
 
-    const mockAddedThread = new AddedThread({
+    const stubRepositoryReturn = new AddedThread({
+      id: "thread-123",
+      title: useCasePayload.title,
+      owner: credentialId,
+    });
+
+    const expectedAddedThread = new AddedThread({
       id: "thread-123",
       title: useCasePayload.title,
       owner: credentialId,
@@ -25,7 +26,7 @@ describe("AddThreadUseCase", () => {
     const mockThreadRepository = new ThreadRepository();
     mockThreadRepository.addThread = jest
       .fn()
-      .mockImplementation(() => Promise.resolve(mockAddedThread));
+      .mockImplementation(() => Promise.resolve(stubRepositoryReturn));
 
     const addThreadUseCase = new AddThreadUseCase({
       threadRepository: mockThreadRepository,
@@ -36,8 +37,10 @@ describe("AddThreadUseCase", () => {
       credentialId
     );
 
-    expect(addedThread).toStrictEqual(mockAddedThread);
+    // Assertion
+    expect(addedThread).toStrictEqual(expectedAddedThread);
 
+    // Assertion
     expect(mockThreadRepository.addThread).toBeCalledWith({
       title: useCasePayload.title,
       body: useCasePayload.body,

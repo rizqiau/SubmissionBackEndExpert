@@ -34,6 +34,23 @@ describe("a ThreadDetail entities", () => {
     );
   });
 
+  it("should throw error when date is an invalid Date object", () => {
+    // Arrange
+    const payload = {
+      id: "thread-123",
+      title: "a thread title",
+      body: "a thread body",
+      date: new Date("invalid date string"),
+      username: "dicoding",
+      comments: [],
+    };
+
+    // Action & Assert
+    expect(() => new ThreadDetail(payload)).toThrowError(
+      "THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION"
+    );
+  });
+
   it("should create ThreadDetail object correctly", () => {
     // Arrange
     const payload = {
@@ -67,9 +84,10 @@ describe("a ThreadDetail entities", () => {
     expect(id).toEqual(payload.id);
     expect(title).toEqual(payload.title);
     expect(body).toEqual(payload.body);
-    expect(date).toEqual(payload.date);
+    expect(date).toEqual(new Date(payload.date).toISOString());
     expect(username).toEqual(payload.username);
     expect(comments).toEqual(payload.comments);
+
     expect(Array.isArray(comments)).toBe(true);
     expect(comments).toHaveLength(2);
     expect(comments[0]).toBeInstanceOf(Object);

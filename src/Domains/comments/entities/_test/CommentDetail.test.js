@@ -32,6 +32,22 @@ describe("a CommentDetail entities", () => {
     );
   });
 
+  it("should throw error when date is an invalid Date object", () => {
+    // Arrange
+    const payload = {
+      id: "comment-123",
+      username: "dicoding",
+      date: new Date("invalid date string"), // Objek Date yang tidak valid
+      content: "sebuah comment",
+      is_delete: false,
+    };
+
+    // Action & Assert
+    expect(() => new CommentDetail(payload)).toThrowError(
+      "COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION"
+    );
+  });
+
   it("should create CommentDetail object correctly when not deleted", () => {
     // Arrange
     const payload = {
