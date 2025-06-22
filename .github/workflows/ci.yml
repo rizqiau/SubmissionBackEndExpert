@@ -37,7 +37,7 @@ jobs:
         run: npm install
 
       - name: Run database migrations
-        run: npm run migrate:test up
+        run: npm run migrate up
         env:
           PGHOST_TEST: localhost
           PGPORT_TEST: 5432
