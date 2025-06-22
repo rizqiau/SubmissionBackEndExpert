@@ -52,4 +52,4 @@ jobs:
           PGDATABASE_TEST: ${{ secrets.PGDATABASE_TEST }}
           ACCESS_TOKEN_KEY: supersecretaccesstoken
           REFRESH_TOKEN_KEY: supersecretrefreshtoken
-          ACCCESS_TOKEN_AGE: 1h # Perbaiki typo ACCCESS_TOKEN_AGE menjadi ACCESS_TOKEN_AGE jika ada
+          ACCCESS_TOKEN_AGE: 3600
