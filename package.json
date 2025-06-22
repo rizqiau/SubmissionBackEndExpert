@@ -10,7 +10,7 @@
     "test:watch:change": "jest --watch --setupFiles dotenv/config -i",
     "test:watch": "jest --watchAll --coverage --setupFiles dotenv/config -i",
     "migrate": "node-pg-migrate",
-    "migrate:test": "node-pg-migrate up"
+    "migrate:test": "node-pg-migrate up -f config/database/test.js"
   },
   "keywords": [],
   "author": "",
@@ -39,7 +39,7 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/config/database/test.js" 
+      "/config/database/test.js"
     ]
   }
 }
