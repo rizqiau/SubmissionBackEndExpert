@@ -1,7 +1,7 @@
 const createServer = require("../createServer");
-const container = require("../../container");
+const container = require("../../container"); // Jika handler memiliki dependensi container
 
-describe("/hello-world endpoint (failure scenario)", () => {
+describe("/hello-world endpoint", () => {
   let server;
 
   beforeAll(async () => {
@@ -9,10 +9,10 @@ describe("/hello-world endpoint (failure scenario)", () => {
   });
 
   afterAll(async () => {
-    await server.stop();
+    await server.stop(); // Pastikan server berhenti setelah semua tes
   });
 
-  it("should deliberately fail to demonstrate CI failure", async () => {
+  it("should response 200 and say hello world", async () => {
     // Arrange
     // No request payload needed
 
@@ -22,9 +22,10 @@ describe("/hello-world endpoint (failure scenario)", () => {
       url: "/hello-world",
     });
 
-    // Assert (sengaja dibuat gagal)
+    // Assert
     const responseJson = JSON.parse(response.payload);
-    expect(response.statusCode).toEqual(200); // Ini akan berhasil
-    expect(responseJson.message).toEqual("This message will cause a failure!"); // Ini akan gagal
+    expect(response.statusCode).toEqual(200);
+    expect(responseJson.status).toEqual("success");
+    expect(responseJson.message).toEqual("Hello World from API!");
   });
 });
