@@ -5,7 +5,6 @@ const users = require("../../Interfaces/http/api/users");
 const authentications = require("../../Interfaces/http/api/authentications");
 const threads = require("../../Interfaces/http/api/threads");
 const comments = require("../../Interfaces/http/api/comments");
-const helloworld = require("../../Interfaces/http/api/helloworld");
 
 const createServer = async (container) => {
   const server = Hapi.server({
@@ -25,7 +24,7 @@ const createServer = async (container) => {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: parseInt(process.env.ACCESS_TOKEN_AGE, 10),
+      maxAgeSec: process.env.ACCCESS_TOKEN_AGE,
     },
     validate: (artifacts) => ({
       isValid: true,
@@ -50,10 +49,6 @@ const createServer = async (container) => {
     },
     {
       plugin: comments,
-      options: { container },
-    },
-    {
-      plugin: helloworld, // <<< TAMBAH BARIS INI
       options: { container },
     },
   ]);
