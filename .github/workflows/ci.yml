@@ -1,9 +1,11 @@
+# .github/workflows/ci.yml
 name: Continuous Integration
 
 on:
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   build-and-test:
@@ -13,9 +15,9 @@ jobs:
       postgres:
         image: postgres:13
         env:
-          POSTGRES_DB: forumapi_test
-          POSTGRES_USER: docker
-          POSTGRES_PASSWORD: docker
+          POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }} # Gunakan secret
+          POSTGRES_USER: ${{ secrets.PGUSER_TEST }} # Gunakan secret
+          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }} # Gunakan secret
         ports:
           - 5432:5432
         options: >-
@@ -37,21 +39,23 @@ jobs:
         run: npm install
 
       - name: Run database migrations
-        run: npm run migrate up
+        run: node-pg-migrate up
         env:
-          PGHOST_TEST: localhost
-          PGPORT_TEST: 5432
-          PGUSER_TEST: docker
-          PGPASSWORD_TEST: docker
-          PGDATABASE_TEST: forumapi_test
+          # Variabel lingkungan standar yang akan dibaca oleh node-pg-migrate
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: ${{ secrets.PGUSER_TEST }} # Gunakan secret
+          PGPASSWORD: ${{ secrets.PGPASSWORD_TEST }} # Gunakan secret
+          PGDATABASE: ${{ secrets.PGDATABASE_TEST }} # Gunakan secret
 
       - name: Run tests (Unit, Integration, Functional)
         run: npm test
         env:
+          # Variabel lingkungan dengan sufiks _TEST yang dibaca oleh pool.js aplikasi Anda
           PGHOST_TEST: localhost
           PGPORT_TEST: 5432
-          PGUSER_TEST: docker
-          PGPASSWORD_TEST: docker
-          PGDATABASE_TEST: forumapi_test
+          PGUSER_TEST: ${{ secrets.PGUSER_TEST }} # Gunakan secret
+          PGPASSWORD_TEST: ${{ secrets.PGPASSWORD_TEST }} # Gunakan secret
+          PGDATABASE_TEST: ${{ secrets.PGDATABASE_TEST }} # Gunakan secret
           ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
           REFRESH_TOKEN_KEY: ${{ secrets.REFRESH_TOKEN_KEY }}
